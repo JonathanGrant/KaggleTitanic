@@ -22,5 +22,10 @@ men_onboard = data[men_only_stats,1].astype(np.float)
 percent_women_survivors = np.sum(women_onboard) / np.size(women_onboard)
 percent_men_survivors = np.sum(men_onboard) / np.size(men_onboard)
 
-print percent_women_survivors
-print percent_men_survivors
+#Now open test file
+test_file = csv.reader(open('test.csv','rb'))
+header = test_file.next()
+
+#Write to new file
+prediction_file = open('genderbasedmodel.csv','wb')
+prediction_writer = csv.writer(prediction_file)
