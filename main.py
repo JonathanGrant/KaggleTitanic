@@ -1,6 +1,9 @@
 #https://www.kaggle.com/c/titanic/details/getting-started-with-python
+import time
 import csv as csv
 import numpy as np
+
+start = time.time()
 
 file = csv.reader(open('train.csv','rb'))
 header = file.next()
@@ -29,3 +32,14 @@ header = test_file.next()
 #Write to new file
 prediction_file = open('genderbasedmodel.csv','wb')
 prediction_writer = csv.writer(prediction_file)
+
+prediction_writer.writerow(['PassengerID','Survived'])
+for row in test_file:
+    if row[3] == 'female':
+        prediction_writer.writerow([row[0],'1'])
+    else:
+        prediction_writer.writerow([row[0],'0'])
+prediction_file.close()
+
+end = time.time()
+print 'Total time elpased:', (end-start), 'seconds'
