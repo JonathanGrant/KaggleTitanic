@@ -10,36 +10,51 @@ header = file.next()
 data = []
 for row in file:
     data.append(row)
-data = np.array(data)
 
-num_passengers = np.size(data[0::,1].astype(np.float))
-num_survivors = np.sum(data[0::,1].astype(np.float))
-percent_survivors = num_survivors / num_passengers
+#I want to use sciKit Learn svm
+from sklearn import svm
+clf = svm.SVC(verbose = 2, gamma = 0.001)
 
-women_only_stats = data[0::,4] == "female"
-men_only_stats = data[0::,4] != "female"
+target = []
+traindata = []
+for dat in data:
+    sex = 0
+    if dat[4] == 'male':
+        sex = 1
+    traindata.append([float(dat[2]),
+         float(dat[6]),
+         float(dat[7]),
+         float(dat[9]),
+        sex])
+    target.append(float(dat[1]))
 
-women_onboard = data[women_only_stats,1].astype(np.float)
-men_onboard = data[men_only_stats,1].astype(np.float)
-
-percent_women_survivors = np.sum(women_onboard) / np.size(women_onboard)
-percent_men_survivors = np.sum(men_onboard) / np.size(men_onboard)
+clf.fit(traindata,target)
 
 #Now open test file
 test_file = csv.reader(open('test.csv','rb'))
 header = test_file.next()
 
-#Write to new file
-prediction_file = open('genderbasedmodel.csv','wb')
-prediction_writer = csv.writer(prediction_file)
+#Write a new file of predictions
+predict_file = open('predict.csv','wb')
+predict = csv.writer(predict_file)
+predict_data = []
 
-prediction_writer.writerow(['PassengerID','Survived'])
 for row in test_file:
-    if row[3] == 'female':
-        prediction_writer.writerow([row[0],'1'])
-    else:
-        prediction_writer.writerow([row[0],'0'])
-prediction_file.close()
+    predict_data.append(row)
+
+for dat in predict_data:
+    sex = 0
+    if dat[3] == 'male':
+        sex = 1
+    try:
+        predict.writerow(clf.predict([float(dat[1]),
+                                       float(dat[5]),
+                                       float(dat[6]),
+                                       float(dat[8]),
+                                      sex]))
+    except:
+        print dat
+
 
 end = time.time()
 print 'Total time elpased:', (end-start), 'seconds'
